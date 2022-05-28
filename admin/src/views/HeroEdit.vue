@@ -13,10 +13,22 @@
           <el-form-item label="头像">
           <el-upload
             class="avatar-uploader"
-            :action="$http.defaults.baseURL+'/upload'"
+            :action="uploadUrl"
+            :headers="getAuthHeaders()"
             :show-file-list="false"
-            :on-success="afterUpload">
+            :on-success="res=>$set(model,'avatar',res.url)">
             <img v-if="model.avatar" :src="model.avatar" class="avatar">
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
+          </el-form-item>
+          <el-form-item label="背景图">
+          <el-upload
+            class="avatar-uploader"
+            :action="uploadUrl"
+            :headers="getAuthHeaders()"
+            :show-file-list="false"
+            :on-success="res=>$set(model,'banner',res.url)">
+            <img v-if="model.banner" :src="model.banner" class="avatar">
             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
           </el-upload>
           </el-form-item>
@@ -67,12 +79,19 @@
               <el-form-item label="图标">
                 <el-upload
                   class="avatar-uploader"
-                  :action="$http.defaults.baseURL+'/upload'"
+                  :action="uploadUrl"
+                  :headers="getAuthHeaders()"
                   :show-file-list="false"
                   :on-success="res=>$set(item,'icon',res.url)">
                   <img v-if="item.icon" :src="item.icon" class="avatar">
                   <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 </el-upload>
+              </el-form-item>
+              <el-form-item label="冷却值">
+                <el-input v-model="item.delay"></el-input>
+              </el-form-item>
+              <el-form-item label="消耗">
+                <el-input v-model="item.cost"></el-input>
               </el-form-item>
               <el-form-item label="描述">
                 <el-input type="textarea" v-model="item.description"></el-input>
@@ -83,6 +102,29 @@
               <el-form-item>
                 <el-button size="small" type="danger" 
                 @click="model.skills.splice(i,1)">删除</el-button>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </el-tab-pane>
+        <el-tab-pane label="最佳搭档">
+          <el-button size="small" @click="model.partners.push({})"><i class="el-icon-plus"></i>添加英雄</el-button>
+          <el-row type="flex" style="flex-wrap:wrap">
+            <el-col :md="12" v-for="(item,i) in model.partners" :key="i">
+              <el-form-item label="英雄">
+                <el-select filterable v-model="item.hero">
+                  <el-option 
+                  v-for="hero in heroes" 
+                  :key="hero._id"
+                  :value="hero._id"
+                  :label="hero.name"></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="描述">
+                <el-input type="textarea" v-model="item.description"></el-input>
+              </el-form-item>
+              <el-form-item>
+                <el-button size="small" type="danger" 
+                @click="model.partners.splice(i,1)">删除</el-button>
               </el-form-item>
             </el-col>
           </el-row>
@@ -111,12 +153,15 @@ export default {
           attack:0,
           survive:0
         },
-        skills:[]
+        skills:[],
+        partners:[]
       },
       // 保存类型的选项，即分类列表中的数据
       categories:[],
       // 保存物品的选项
-      items:[]
+      items:[],
+      // 英雄列表，用在选择英雄搭档时
+      heroes:[]
     }
   },
   methods: {
@@ -140,10 +185,6 @@ export default {
       const res=await this.$http.get(`rest/heros/${this.id}`)
       this.model=Object.assign(this.model,res.data)
     },
-    // 上传图片成功后
-    afterUpload(res){
-      this.model.avatar=res.url
-    },
     // 获取分类列表
     async fetchCategories(){
       const res=await this.$http.get('rest/categories')
@@ -154,9 +195,15 @@ export default {
       const res=await this.$http.get('rest/items')
       this.items=res.data
     },
+    // 获取英雄列表
+    async fetchHeroes(){
+      const res=await this.$http.get('rest/heroes')
+      this.heroes=res.data
+    },
   },
   created() {
     this.fetchCategories()
+    this.fetchHeroes()
     this.fetchItems()
     // 如果id存在，表示是编辑，不是新建。因此通过fetch去获取该分类的具体信息
     this.id&&this.fetch()

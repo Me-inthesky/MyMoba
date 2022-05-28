@@ -22,7 +22,7 @@
     </el-form>
   </div>
 </template>
-<script>
+<script>                                                                                            
 export default {
   // 进入编辑功能(不是新建)时，将具体某个分类的id传过来
   props:{

@@ -5,11 +5,6 @@
       <el-submenu index="1">
         <template slot="title"><i class="el-icon-message"></i>内容管理</template>
         <el-menu-item-group>
-          <template slot="title">分类</template>
-          <el-menu-item index="/categories/create">新建分类</el-menu-item>
-          <el-menu-item index="/categories/list">分类列表</el-menu-item>
-        </el-menu-item-group>
-        <el-menu-item-group>
           <template slot="title">物品</template>
           <el-menu-item index="/items/create">新建物品</el-menu-item>
           <el-menu-item index="/items/list">物品列表</el-menu-item>
@@ -36,6 +31,11 @@
       <el-submenu index="3">
         <template slot="title"><i class="el-icon-message"></i>系统设置</template>
         <el-menu-item-group>
+          <template slot="title">分类</template>
+          <el-menu-item index="/categories/create">新建分类</el-menu-item>
+          <el-menu-item index="/categories/list">分类列表</el-menu-item>
+        </el-menu-item-group>
+        <el-menu-item-group>
           <template slot="title">管理员</template>
           <el-menu-item index="/admin_users/create">新建管理员</el-menu-item>
           <el-menu-item index="/admin_users/list">管理员列表</el-menu-item>
@@ -58,8 +58,7 @@
     </el-header>
     
     <el-main>
-      <router-view></router-view>
-      
+      <router-view :key="$route.path"></router-view>
     </el-main>
   </el-container>
 </el-container>
